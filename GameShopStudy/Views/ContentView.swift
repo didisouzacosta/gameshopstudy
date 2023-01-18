@@ -8,16 +8,23 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject var cartManager = CartManager()
+    @Environment(\.horizontalSizeClass)
+    private var sizeClass
     
-    var columns: [GridItem] = [
-        .init(.adaptive(minimum: 160), spacing: 10)
-    ]
+    @StateObject
+    private var cartManager = CartManager()
+    
+    private var gridCompactLayout: [GridItem] = (0...1).map { _ in GridItem() }
+    private var gridLargeLayout: [GridItem] = (0...3).map { _ in GridItem() }
+    
+    private var isCompact: Bool {
+        sizeClass == .compact
+    }
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                LazyVGrid(columns: columns) {
+            ScrollView(showsIndicators: false) {
+                LazyVGrid(columns: isCompact ? gridCompactLayout : gridLargeLayout) {
                     ForEach(productList, id: \.id) { product in
                         ProductCard(product: product)
                             .environmentObject(cartManager)
